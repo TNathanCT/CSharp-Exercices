@@ -1,0 +1,102 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Framework {
+	class UI {
+		private static UI _instance;
+		public static UI Instance {
+			get {
+				if (_instance == null)
+					_instance = new UI();
+				return _instance;
+			}
+		}
+		private List<Element> _elements;
+		public static List<Element> Elements {
+			get {
+				return Instance._elements;
+			}
+		}
+		public UI() {
+			_elements = new List<Element>();
+		}
+		public static void AddElement(Element element) {
+			Elements.Add(element);
+		}
+		public static void RemoveElement(Element element) {
+			Elements.Remove(element);
+		}
+	}
+	class Element {
+		public GameObject GameObject { get; private set; }
+		public RectTransform RectTransform {
+			get {
+				return (RectTransform)GameObject.transform;
+			}
+		}
+		public Transform Transform {
+			get {
+				return GameObject.transform;
+			}
+		}
+		public Element(GameObject gameObject) {
+			GameObject = gameObject;
+		}
+		public Transform Parent {
+			get {
+				return Transform.parent;
+			}
+			set {
+				Transform.SetParent(value, false);
+			}
+		}
+		public float Width {
+			get {
+				return RectTransform.rect.width;
+			}
+		}
+		public float Height {
+			get {
+				return RectTransform.rect.height;
+			}
+		}
+		public Vector3 Position {
+			get {
+				return RectTransform.position;
+			}
+			set {
+				RectTransform.position = value;
+			}
+		}
+	}
+	class CardElement : Element {
+		public CardElement(GameObject gameObject) : base(gameObject) {
+		}
+	}
+	class StoryboardItem {
+		GameObject _obj;
+		public Vector3 _fromPos, _toPos, _fromAngle, _toAngle, _fromScale, _toScale;
+		public float _fromAlpha, _toAlpha;
+		public StoryboardItem(GameObject obj, bool _isReverse) {
+			_obj = obj;
+			_fromPos = obj.transform.position;
+			_toPos = new Vector3(_fromPos.x + (_isReverse ? 500 : -500), _fromPos.y + (_isReverse ? 500 : -500), _fromPos.z);
+			_fromAngle = obj.transform.eulerAngles;
+			_toAngle = new Vector3(0, 0, (_isReverse ? 0 : 180));
+			_fromScale = obj.transform.localScale;
+			_toScale = new Vector3(_isReverse ? 1 : 0.25F, _isReverse ? 1 : 0.25F, 0);
+			_fromAlpha = Group.alpha;
+			_toAlpha = _isReverse ? 1F : 0.1F;
+		}
+		public Transform Transform {
+			get {
+				return _obj.transform;
+			}
+		}
+		public CanvasGroup Group {
+			get {
+				return _obj.GetComponent<CanvasGroup>();
+			}
+		}
+	}
+}
