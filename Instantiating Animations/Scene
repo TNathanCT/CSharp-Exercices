@@ -1,0 +1,104 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System;
+using System.IO;
+using System.Text;
+
+
+
+public class Scene : MonoBehaviour {
+    
+
+    [AddComponentMenu("Assets/Create/Add C# Class")]
+
+    public Canvas Canvas;
+    ButtonAnimation ButtonAnim;
+
+	
+	void Awake () {
+        GameObject Logo = Resources.Load<GameObject>("Prefab/Logo");
+        GameObject Appear = Instantiate(Logo, new Vector3 (150,150,0), Quaternion.identity) as GameObject;
+        Appear.transform.SetParent(GameObject.Find("Canvas").transform);
+        Appear.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GotoGames");
+        Framework.UI.AddElement(new Framework.CardElement(Appear.gameObject));
+
+
+        
+
+
+        GameObject Move = Resources.Load<GameObject>("Prefab/Moving");
+        GameObject Instance = Instantiate(Move, ButtonAnim.pointB, Quaternion.identity) as GameObject;
+        Instance.transform.SetParent(GameObject.Find("Canvas").transform);
+        Instance.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Button");
+        Framework.UI.AddElement(new Framework.CardElement(Instance.gameObject));
+
+
+        ButtonAnim = FindObjectOfType<ButtonAnimation>();
+
+
+
+        //this creates a gameObject with ALL the properites necessary (primitive mesh renderer, collider, and a material - optional)
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.transform.position = new Vector3(20f, 50f, 0);
+
+        
+
+
+
+
+        if (Logo == null)
+        {
+            Debug.Log("Selected object not Valid");
+            return;
+        }
+
+        // remove whitespace and minus
+        string name = Logo.name.Replace(" ", "_");
+        name = name.Replace("-", "_");
+        string copyPath = "Assets/" + name + ".cs";
+        Debug.Log("Creating Classfile: " + copyPath);
+        if (File.Exists(copyPath) == false)
+        { // do not overwrite
+            using (StreamWriter outfile =
+                new StreamWriter(copyPath))
+            {
+                outfile.WriteLine("using UnityEngine;");
+                outfile.WriteLine("using System.Collections;");
+                outfile.WriteLine("");
+                outfile.WriteLine("public class " + name + " : MonoBehaviour {");
+                outfile.WriteLine("Vector3 rotationEuler;");
+                outfile.WriteLine(" ");
+                outfile.WriteLine(" // Update is called once per frame");
+                outfile.WriteLine(" void Update () {");
+                outfile.WriteLine("rotationEuler += Vector3.forward*80*Time.deltaTime;");
+                outfile.WriteLine("transform.rotation= Quaternion.Euler(rotationEuler);");
+                outfile.WriteLine(" }");
+                outfile.WriteLine("}");
+            }
+        }
+        Logo.AddComponent(Type.GetType(name));
+        //attacher le script au gameobject Logo.
+
+
+     
+    }
+
+
+    void OnMouseDown()
+    {
+        RectTransform Background = Resources.Load<RectTransform>("Prefab/Background");
+        RectTransform BringitOut = Instantiate(Background, new Vector3(781, 271, 0), Quaternion.identity); //Ca couvre tout l'écran
+        BringitOut.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Board0");
+    }
+
+    void Update()
+    {
+        
+    }
+
+    
+}
+
