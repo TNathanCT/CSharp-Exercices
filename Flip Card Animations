@@ -1,0 +1,85 @@
+ using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System;
+
+public class Main : MonoBehaviour {
+
+	// Use this for initialization
+	public Canvas Canvas;
+
+	private bool _isReverse { get; set; }
+	void Awake() {
+		RectTransform prefab = Resources.Load<RectTransform>("Prefab/Card");
+		for (int y = 0; y < 5; y++) {
+			for (int x = 0; x < 5; x++) {
+				RectTransform instance = Instantiate(prefab, new Vector3(x * 100, y * 100, 0), Quaternion.identity);
+				instance.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Game/Cards/Backs/back-4@2x");
+				AddEventTriggerListener(instance.GetComponent<EventTrigger>(), EventTriggerType.PointerClick, OnClicked);
+				Framework.UI.AddElement(new Framework.CardElement(instance.gameObject));
+			}
+		}
+	}
+	void Start () {
+		foreach (Framework.Element element in Framework.UI.Elements) {
+			element.Parent = Canvas.transform;
+		}
+	}
+
+	// Update is called once per frame
+	void Update () {
+		
+	}
+	public static void AddEventTriggerListener(EventTrigger trigger,
+																					 EventTriggerType eventType,
+																					 System.Action<BaseEventData> callback) {
+		EventTrigger.Entry entry = new EventTrigger.Entry();
+		entry.eventID = eventType;
+		entry.callback = new EventTrigger.TriggerEvent();
+		entry.callback.AddListener(new UnityEngine.Events.UnityAction<BaseEventData>(callback));
+		trigger.triggers.Add(entry);
+	}
+	void OnClicked(BaseEventData eventData) {
+		PointerEventData pointerEventData = (PointerEventData)eventData;
+		GameObject obj = pointerEventData.pointerPress;
+		//Animate(obj);
+		AnimateAll(_isReverse, ()=> _isReverse = !_isReverse);
+	}
+	void Animate(GameObject obj, bool _isReverse, Action onFinish = null) {
+		Framework.StoryboardItem item = new Framework.StoryboardItem(obj, _isReverse);
+		AnimationHelper.Animate(Time.time, 0.380f, (t) => {
+			float t2 = EasingFunctions.easeIn(t);
+			item.Transform.position = Vector3.Lerp(item._fromPos, item._toPos, t2);
+			item.Transform.eulerAngles = Vector3.Lerp(item._fromAngle, item._toAngle, t2);
+			item.Transform.localScale = Vector3.Lerp(item._fromScale, item._toScale, t2);
+			item.Group.alpha = Mathf.Lerp(item._fromAlpha, item._toAlpha, t2);
+		}, () => {
+			item = null;
+			if (onFinish != null)
+				onFinish();
+		});
+	}
+	void AnimateAll(bool _isReverse, Action onFinish = null) {
+		List<Framework.StoryboardItem> storyBoard = new List<Framework.StoryboardItem>();
+		foreach(Framework.Element element in Framework.UI.Elements) {
+			storyBoard.Add(new Framework.StoryboardItem(element.GameObject, _isReverse));
+		}
+		AnimationHelper.Animate(Time.time, 0.380f, (t) => {
+			foreach (Framework.StoryboardItem item in storyBoard) {
+				float t2 = EasingFunctions.easeIn(t);
+				item.Transform.position = Vector3.Lerp(item._fromPos, item._toPos, t2);
+				item.Transform.eulerAngles = Vector3.Lerp(item._fromAngle, item._toAngle, t2);
+				item.Transform.localScale = Vector3.Lerp(item._fromScale, item._toScale, t2);
+				item.Group.alpha = Mathf.Lerp(item._fromAlpha, item._toAlpha, t2);
+			}
+		}, () => {
+			storyBoard = null;
+			if (onFinish != null)
+				onFinish();
+		});
+	}
+}
+
+
