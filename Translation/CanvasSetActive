@@ -1,0 +1,39 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CanvasSetActive : MonoBehaviour {
+
+    public GameObject Canvas;
+    public GameObject Buttons;
+
+	void Start () {
+        Canvas.SetActive(false);
+        Buttons.SetActive(true);
+		
+	}
+
+    public void SetEnglish()
+    {
+        Canvas.SetActive(true);
+        Buttons.SetActive(false);
+        Localize.SetCurrentLanguage(SystemLanguage.English);
+        LocalizeImage.SetCurrentLanguage();
+    }
+
+    public void SetItalian()
+    {
+        Canvas.SetActive(true);
+        Buttons.SetActive(false);
+        Localize.SetCurrentLanguage(SystemLanguage.Italian);
+        LocalizeImage.SetCurrentLanguage();
+    }
+
+    public void SetJapanese()
+    {
+        Canvas.SetActive(true);
+        Buttons.SetActive(false);
+        Localize.SetCurrentLanguage(SystemLanguage.Japanese);
+        LocalizeImage.SetCurrentLanguage();
+    }
+}
