@@ -1,0 +1,32 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CanvasAppear : MonoBehaviour {
+
+    public GameObject LanguageCanvas;
+
+
+
+    public void SetEnglish()
+    {
+        Instantiate(LanguageCanvas);
+        Localize.SetCurrentLanguage(SystemLanguage.English);
+        LocalizeImage.SetCurrentLanguage();
+    }
+
+    public void SetItalian()
+    {
+        Instantiate(LanguageCanvas);
+        Localize.SetCurrentLanguage(SystemLanguage.Italian);
+        LocalizeImage.SetCurrentLanguage();
+    }
+
+    public void SetJapanese()
+    {
+        Instantiate(LanguageCanvas);
+        Localize.SetCurrentLanguage(SystemLanguage.Japanese);
+        LocalizeImage.SetCurrentLanguage();
+    }
+
+}
