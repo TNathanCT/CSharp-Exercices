@@ -1,0 +1,10 @@
+using UnityEngine;
+using System.Collections;
+using UnityEditor;
+using System.Collections.Generic;
+
+[CreateAssetMenu]
+public class DominoLevelData : ScriptableObject {
+    public List<DominoData> dominoList;
+	
+}
