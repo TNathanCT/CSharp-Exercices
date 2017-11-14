@@ -1,0 +1,32 @@
+using UnityEngine;
+using System.Collections;
+
+public class RandomBounce : MonoBehaviour {
+
+	[SerializeField]
+	float minDelay = 1;
+	[SerializeField]
+	float maxDelay = 1.5f;
+	[SerializeField]
+	Animator animator;
+
+	float nextBounce;
+
+	// Use this for initialization
+	void Start () {
+		CalculateNextBounce ();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		if (Time.time > nextBounce) {
+			animator.SetTrigger ("bounce");
+			CalculateNextBounce ();
+		}
+	}
+
+	void CalculateNextBounce () {
+		nextBounce = Time.time + Random.Range (minDelay, maxDelay);
+	}
+
+}
