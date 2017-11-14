@@ -1,0 +1,46 @@
+using UnityEngine;
+using System.Collections;
+using UnityEditor;
+
+[CustomEditor(typeof(Rigidbody))]
+[CanEditMultipleObjects]
+public class RigidbodyEditor : Editor {
+
+	Color defaultColor;
+
+	public void Awake() {
+		Rigidbody rigid = (Rigidbody)serializedObject.targetObject;
+		// 1. Color from speed (at runtime only)
+		Material material;
+		material = rigid.gameObject.GetComponent<MeshRenderer> ().sharedMaterial;
+		defaultColor = material.color;
+	}
+
+	// Use this for initialization
+	public override void OnInspectorGUI () {
+		Rigidbody rigid = (Rigidbody)serializedObject.targetObject;
+		// 1. Color from speed (at runtime only)
+		Material material;
+		if (Application.isEditor && Application.isPlaying) {
+			material = rigid.gameObject.GetComponent<MeshRenderer> ().material;
+			if (rigid.velocity.sqrMagnitude > 1)
+				material.color = Color.red;
+			else {
+				material.color = defaultColor;
+			}
+			// 2. Color from orientation
+			if (Mathf.Abs (rigid.transform.localEulerAngles.x) > 88 && Mathf.Abs (rigid.transform.localEulerAngles.x) < 92)
+				material.color = Color.black;
+		}
+		base.OnInspectorGUI ();
+		Repaint ();
+	}
+
+	public void OnSceneGUI() {
+		Rigidbody r = target as Rigidbody;
+		Quaternion velocityQuat = new Quaternion();
+		velocityQuat.SetFromToRotation(Vector3.forward, r.velocity);
+		Handles.color = Color.magenta;
+		Handles.ArrowCap (1, r.transform.position, velocityQuat, HandleUtility.GetHandleSize(r.transform.position));
+	}
+}
