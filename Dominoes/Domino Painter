@@ -1,0 +1,185 @@
+using UnityEngine;
+using System.Collections;
+using UnityEditor;
+using System.Collections.Generic;
+
+public class DominoPainter : EditorWindow {
+
+	[SerializeField]
+	GameObject prefab;
+
+	[SerializeField]
+	int prefabLayer;
+
+	[SerializeField]
+	bool paint;
+
+	[SerializeField]
+	DominoLevelData levelData;
+
+	float dominoHeight;
+	Vector3 lastDominoPosition;
+	GameObject parentObject;
+
+	[MenuItem("Window/Equilibre/Domino Painter")]
+	static void Init () {
+		DominoPainter dp = EditorWindow.GetWindow<DominoPainter> ();
+		dp.wantsMouseMove = true;
+		dp.Show ();
+	}	
+
+	void OnEnable () {
+		Debug.Log ("window enabled");
+		SceneView.onSceneGUIDelegate += OnSceneGUI;
+	}
+	void OnDisable () {
+		Debug.Log ("window disabled");
+		SceneView.onSceneGUIDelegate -= OnSceneGUI;
+	}
+
+	void OnSceneGUI(SceneView sceneView) {
+
+		Event e = Event.current;
+
+		Handles.BeginGUI ();
+		paint = GUILayout.Toggle(paint, "PAINT", "button", GUILayout.MaxWidth(120));
+		Repaint ();
+		Handles.EndGUI ();
+
+		if (!paint)
+			return;
+
+		if (e.isMouse) {
+			if ((e.type == EventType.MouseDown || e.type == EventType.MouseDrag) && e.button == 0 && !e.alt) {
+				Ray r = HandleUtility.GUIPointToWorldRay (e.mousePosition);
+				RaycastHit hit;
+				Debug.DrawRay (r.origin, r.direction*500, Color.green, 5);
+				if (Physics.Raycast (r, out hit)) {
+					// Check around
+					if (hit.collider.gameObject.layer == prefabLayer) {
+						// Destroy domino instead of creating one if Command/Ctrl key is down
+						if (e.control || e.command)
+							DestroyImmediate (hit.collider.gameObject);
+					} else {
+						Vector3 position = hit.point + Vector3.up * dominoHeight / 2;
+
+						// Draw domino if we are far away enough
+						if ((lastDominoPosition - position).magnitude > dominoHeight * 0.4f) {
+							// Check around
+							//Debug.DrawRay (position, Vector3.down * dominoHeight, Color.green, 3);
+							if (!Physics.CheckSphere (position, 0.1f)) {
+								//
+								CheckParent ();
+								// Put new prefab on ground
+								// - ugly way to have a look rotation with dominos always being upwards (only Y rotation)
+								Quaternion rotation = Quaternion.LookRotation (lastDominoPosition - position, Vector3.up);
+								rotation = Quaternion.Euler (0, rotation.eulerAngles.y, 0);
+
+								GameObject go = (GameObject)Instantiate (prefab, position, rotation);
+								go.transform.parent = parentObject.transform;
+								lastDominoPosition = position;
+							}
+						}
+					}
+					e.Use ();
+				}
+			}
+			Handles.color = new Color (1, 0, 0, 0.25f);
+			Handles.CubeCap (1, lastDominoPosition, Quaternion.identity, 0.5f);
+		} else if (e.type == EventType.Layout)
+		{
+			int controlID = GUIUtility.GetControlID(FocusType.Passive);
+			HandleUtility.AddDefaultControl(controlID);
+		}
+	}
+
+	void CheckParent() {
+		if (parentObject == null)
+			parentObject = GameObject.Find ("DominoLevel");
+		if (parentObject == null) {
+			parentObject = new GameObject ("DominoLevel");
+			parentObject.transform.position = Vector3.zero;
+			parentObject.transform.rotation = Quaternion.identity;
+		}
+	}
+
+
+	void OnGUI() {
+		prefab = (GameObject)EditorGUILayout.ObjectField ("Prefab", prefab, typeof(GameObject), false);
+		if (prefab != null) {
+			dominoHeight = prefab.GetComponentInChildren<Renderer> ().bounds.size.y;
+		}
+		prefabLayer = EditorGUILayout.LayerField ("Prefab layer", prefabLayer);
+		paint = EditorGUILayout.Toggle ("Paint", paint);
+
+		levelData = (DominoLevelData)EditorGUILayout.ObjectField ("Level", levelData, typeof(DominoLevelData), false);
+
+		EditorGUILayout.Space ();
+		EditorGUILayout.BeginHorizontal (EditorStyles.toolbar);
+		GUILayout.FlexibleSpace ();
+		Color previousColor = GUI.color;
+		GUI.color = Color.green;
+		if (GUILayout.Button ("LOAD", EditorStyles.toolbarButton)) {
+			Load ();
+		}
+		GUI.color = previousColor;
+		GUILayout.Space (10);
+		GUI.color = Color.cyan;
+		if (GUILayout.Button ("SAVE", EditorStyles.toolbarButton)) {
+			Save ();
+		}
+		GUI.color = previousColor;
+		GUILayout.Space (10);
+		GUI.color = Color.red;
+		if (GUILayout.Button ("CLEAR", EditorStyles.toolbarButton)) {
+			Clear();
+		}
+		GUI.color = previousColor;
+		GUILayout.FlexibleSpace ();
+		EditorGUILayout.EndHorizontal ();
+
+
+	}
+
+	void Load() {
+		// Load from scriptable object
+		CheckParent ();
+
+		for (int i=levelData.dominoList.Count-1;i>=0;i--) {
+			// Put new prefab on ground
+			GameObject go = (GameObject)Instantiate (prefab, levelData.dominoList[i].position, levelData.dominoList[i].rotation);
+			go.transform.parent = parentObject.transform;
+		}
+	}
+
+	void Save() {
+		// Save to scriptable object
+		if (levelData == null) {
+			levelData = ScriptableObject.CreateInstance<DominoLevelData> ();
+			AssetDatabase.CreateAsset (levelData, AssetDatabase.GenerateUniqueAssetPath ("Assets/scenes/level.asset"));
+		}
+
+		if (levelData.dominoList == null)
+			levelData.dominoList = new List<DominoData> ();
+		else
+			levelData.dominoList.Clear ();
+
+		for (int i=parentObject.transform.childCount-1;i>=0;i--) {
+			DominoData domino = new DominoData ();
+			domino.position = parentObject.transform.GetChild (i).position;
+			domino.rotation = parentObject.transform.GetChild (i).rotation;
+			levelData.dominoList.Add (domino);
+		}
+		EditorUtility.SetDirty (levelData);
+		AssetDatabase.SaveAssets ();
+		AssetDatabase.Refresh ();
+	}
+
+	void Clear() {
+		// Clear dominos
+		for (int i=parentObject.transform.childCount-1;i>=0;i--) {
+			DestroyImmediate(parentObject.transform.GetChild(i).gameObject);
+		}
+	}
+
+}
