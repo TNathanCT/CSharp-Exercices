@@ -1,0 +1,87 @@
+using System;
+
+
+
+
+//Individual[]               =>   Population
+//int[], char[], MyClass[]   =>   Genes (individual)
+//float CalculateFitness()   =>   Natural Selection
+//Individual Crossover()     =>   Reproduction
+//void Mutate()              =>   Mutation
+
+public class DNA<T> {
+    public T[] genes { get; private set; } //the T represents any arbritary type we want to store.
+
+    public float fitness { get; private set; }
+
+    private Random random;
+    private Func<T> getRandomGene; //store function here.
+    private Func<int, float> fitnessFunction;
+
+    public DNA(int size, Random random, Func<T> getRandomGene, Func<int, float> fitnessFunction,bool shouldInitGene = true)
+        //this is how we want the random to work.
+        //the Func<T> stores a reference to a function that returns an object of type T. Variable that holds a function. In this case, we want this function to generate a random object of what this type this happens to be.
+    {
+        genes = new T[size];
+        this.random = random; //we assign the random to the original one.
+
+        this.getRandomGene = getRandomGene;//assign the function here.
+
+        this.fitnessFunction = fitnessFunction;
+
+        for (int i = 0; i < genes.Length; i++)
+        {
+            genes[i] = getRandomGene();
+        }
+
+
+    }
+
+    public float CalculateFitness(int index)
+    {
+        fitness = fitnessFunction(index);
+        return fitness;
+    }
+
+
+
+
+
+    public DNA<T> CrossOver(DNA<T> otherParent)
+    {
+        DNA<T> child = new DNA<T>(genes.Length, random, getRandomGene, fitnessFunction, shouldInitGene: false);
+        //for the boolean, we generate random genes when we're going to replace them anyway.
+
+        
+
+        //Random random = new Random(); 
+        //this flips the coins. Generate number between 0 and 1; 
+
+        ////DO NOT WRITE IT LIKE THIS. THIS FORCES THE FUNCTION TO GRAB A NUMBER EVERY FRAME, AND IT WILL BE THE SAME ONE OVER AND OVER AGAIN.
+
+
+        for (int i = 0; i < genes.Length; i++)
+        {
+
+            //coin toss, does the child inherit the geners of mother or father
+            //child.genes[i] = genes[i];
+            //child.genes[i] = otherParent.genes[i];
+            child.genes[i] = random.NextDouble() < 0.5 ? genes[i] : otherParent.genes[i];
+        }
+        return child;
+
+        
+    }
+
+    public void Mutate(float MutationRate)
+    {
+        for(int i = 0; i < genes.Length; i++)
+        {
+            if(random.NextDouble() <= MutationRate) //the mutation appears at the rate that larger or equal to the rate, then add it to the genes.
+            {
+                genes[i] = getRandomGene();//we now generate a randome gene and add it to the Array.
+            }
+        }
+    }
+
+}
