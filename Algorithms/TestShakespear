@@ -1,0 +1,70 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine.UI;
+using UnityEngine;
+using System.Text;
+
+
+
+public class TestShakespear : MonoBehaviour {
+    [Header("Genetic Algorithm")]
+    [SerializeField] string targetString = "To be, or not be, that is the question";
+    [SerializeField] string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;.|!#$%&/()=?";
+    [SerializeField] int populationSize = 200;
+    [SerializeField] float mutationRate = 0.01f;
+
+    [Header("Other")]
+    [SerializeField] int numCharsPerText = 15000;
+    [SerializeField] Text targetText;
+    [SerializeField] Text bestText;
+    [SerializeField] Text bestFitnessText;
+    [SerializeField] Text numGenerationsTExt;
+    [SerializeField] Transform populationTextParent;
+    [SerializeField] Text textPrefab;
+
+    private GeneticAlgorithms<char> ga;
+    private System.Random random;
+
+    private void Start()
+    {
+        targetText.text = targetString;
+
+        if (string.IsNullOrEmpty(targetString))
+        {
+            this.enabled = false;
+        }
+        random = new System.Random();
+        ga = new GeneticAlgorithms<char>(populationSize, targetString.Length, random, GetRandomCharacter, FitnessFunction, mutationRate);
+    }
+
+
+    private void Update()
+    {
+        ga.NewGeneration();
+        
+    }
+
+
+    private char GetRandomCharacter()
+    {
+        int i = random.Next(validCharacters.Length);
+
+        return validCharacters[i];
+    }
+
+    private float FitnessFunction(int index)
+    {
+        DNA<char> dna = ga.Population[index];
+        float score = 0;
+
+        for(int i = 0; i < ga.Population[index].genes.Length; i++)
+        {
+            if(dna.genes[i] == targetString[i])
+            {
+                score += 1;
+            }
+        }
+        score /= targetString.Length;
+        return score;
+    }
+}
