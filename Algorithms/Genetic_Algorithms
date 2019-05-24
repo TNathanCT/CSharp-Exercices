@@ -1,0 +1,110 @@
+using System;
+using System.Collections.Generic;
+
+
+public class GeneticAlgorithms<T> {
+
+    public List<DNA<T>> Population { get; private set; }
+    public int Generation { get; private set; }
+
+    public float MutationRate; //not declared as private set, change the rate while the algoritm is running.
+
+
+    public float bestFitness { get; private set; }
+    public T[] bestGenes { get; private set; }
+
+    private Random random;
+
+
+    private float fitnessSum;
+
+
+
+    public GeneticAlgorithms(int populationSize, int DNAsize, Random random, Func<T> getRandomGene, Func<int, float> fitnessFunction, float mutationrate = .01f)
+    {
+
+        Generation = 1;
+        MutationRate = mutationrate;
+        Population = new List<DNA<T>>();
+        this.random = random;
+
+        for(int i = 0; i <populationSize; i++)
+        {
+            Population.Add(new DNA<T>(DNAsize, random, getRandomGene, fitnessFunction, shouldInitGene: true));
+            //this will continuously generate new generation or create a function.
+        }
+    }
+
+
+    public void NewGeneration()
+    {
+        if(Population.Count <= 0)
+        {
+            return;
+        }
+
+        CalculateFitness();
+
+        List<DNA<T>> newpopulation = new List<DNA<T>>();
+
+        for(int i = 0; i< Population.Count; i++)
+        {
+            DNA<T> parent1 = ChooseParent();
+            DNA<T> parent2 = ChooseParent();
+
+            DNA<T> child = parent1.CrossOver(parent2);
+            child.Mutate(MutationRate);
+
+            newpopulation.Add(child);
+
+
+        }
+
+        Population = newpopulation;
+        Generation++;
+
+    }
+
+    public void CalculateFitness()
+    {
+        fitnessSum = 0;
+
+        //find the best gene in our population
+        DNA<T> best = Population[0];
+
+
+
+
+
+
+        for (int i = 0; i < Population.Count; i++)
+        {
+
+           fitnessSum += Population[i].CalculateFitness(i);
+
+            if(Population[i].fitness > best.fitness)
+            {
+                best = Population[i];
+            }
+        }
+        bestFitness = best.fitness;
+        best.genes.CopyTo(bestGenes, 0);//copy those genes
+    }
+
+    private DNA<T> ChooseParent()
+    {
+        double randomNumber = random.NextDouble() * fitnessSum;
+        for (int i = 0; i < Population.Count; i++)
+        {
+            if(randomNumber < Population[i].fitness)
+            {
+                return Population[i];
+            }
+
+            randomNumber -= Population[i].fitness;
+        }
+
+        return null;
+    }
+
+}
