@@ -1,0 +1,29 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Actions : MonoBehaviour
+{
+
+    public IEnumerator MoveFromTo(Transform objectToMove, Vector3 a, Vector3 b, float speed)
+    {
+        float step = (speed / (a - b).magnitude) * Time.fixedDeltaTime;
+        float t = 0;
+        while (t <= 1.0f)
+        {
+            t += step;
+            objectToMove.position = Vector3.Lerp(a, b, t);
+            yield return new WaitForFixedUpdate();
+        }
+        objectToMove.position = b;
+    }
+
+    public IEnumerator ContinuousRotation()
+    {
+        while (true)
+        {
+            transform.Rotate(Vector3.forward, 10);
+            yield return new WaitForSeconds(0.01f);
+        }
+    }
+}
