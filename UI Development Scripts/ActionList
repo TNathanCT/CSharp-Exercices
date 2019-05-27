@@ -1,0 +1,48 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ActionList : MonoBehaviour {
+
+    [SerializeField]
+    private Button ButtonTemplate;
+
+    [SerializeField]
+    private GameObject[] ArrayField;
+
+
+
+    Actions Action;
+
+    private void Start()
+    {
+        Action = FindObjectOfType<Actions>();
+
+
+        for (int i = 0; i < 2; i++)
+        {
+            Button button = Instantiate(ButtonTemplate) as Button;
+            button.enabled = true;
+
+            button.GetComponent<ButtonListButton>().SetText("Button #" + i);
+            button.transform.SetParent(ButtonTemplate.transform.parent, false);
+
+
+
+
+        }
+
+        ArrayField = GameObject.FindGameObjectsWithTag("Player");
+
+
+        ArrayField[1].GetComponent<Button>().onClick.AddListener(() => StartCoroutine(FindObjectOfType<Actions>().MoveFromTo()));
+
+        ArrayField[2].GetComponent<Button>().onClick.AddListener(() => Action.StartCoroutine(FindObjectOfType<Actions>().ContinuousRotation()));
+
+
+
+    }
+
+
+}
