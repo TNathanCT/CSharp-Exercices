@@ -1,0 +1,74 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PawnObject : MonoBehaviour {
+
+
+    public GameObject[] GO;
+
+    public void SpawnCube() {
+
+        Destroy();
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.transform.position = new Vector3(0, 0, 0);
+
+
+        Rigidbody rd = cube.AddComponent<Rigidbody>();
+        rd.useGravity = false;
+
+   
+	}
+
+    public void SpawnSphere()
+    {
+        Destroy();
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        sphere.transform.position = new Vector3(0, 0, 0);
+
+
+        Rigidbody rd = sphere.AddComponent<Rigidbody>();
+        rd.useGravity = false;
+
+ 
+    }
+
+
+    public void SpawnCapsule()
+    {   Destroy();
+
+        GameObject capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        capsule.transform.position = new Vector3(0, 0, 0);
+
+
+        Rigidbody rd = capsule.AddComponent<Rigidbody>();
+        rd.useGravity = false;
+
+    }
+
+
+    public void SpawnCylinder()
+    {
+        Destroy();
+
+
+        GameObject Cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        Cylinder.transform.position = new Vector3(0, 0, 0);
+
+
+        Rigidbody rd = Cylinder.AddComponent<Rigidbody>();
+        rd.useGravity = false;
+
+    }
+
+
+    void Destroy()
+    {
+        GO = GameObject.FindGameObjectsWithTag("Untagged");
+        for (var i = 0; i < GO.Length; i++)
+        {
+            Destroy(GO[i]);
+        }
+    }
+
+}
