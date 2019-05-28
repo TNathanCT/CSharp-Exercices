@@ -1,0 +1,96 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ButtonListControl : MonoBehaviour {
+
+    [SerializeField]
+    private  Button ButtonTemplate;
+
+    [SerializeField]
+    private GameObject[] ArrayField;
+
+
+
+    PawnObject PO;
+
+    private void Start()
+    {
+        PO = FindObjectOfType<PawnObject>();
+
+
+        for (int i = 0; i < 10; i++)
+        {
+            Button button = Instantiate(ButtonTemplate) as Button;
+            button.enabled = true;
+
+            button.GetComponent<ButtonListButton>().SetText("Button #" + i);
+            button.transform.SetParent(ButtonTemplate.transform.parent, false);
+
+
+            
+            
+        }
+
+        ArrayField = GameObject.FindGameObjectsWithTag("Player");
+
+
+        ArrayField[1].GetComponent<Button>().onClick.AddListener(() => PO.SpawnCube());
+
+        ArrayField[2].GetComponent<Button>().onClick.AddListener(() => PO.SpawnSphere());
+
+
+        ArrayField[3].GetComponent<Button>().onClick.AddListener(() => PO.SpawnCylinder());
+
+        ArrayField[4].GetComponent<Button>().onClick.AddListener(() => PO.SpawnCapsule());
+
+
+    }
+
+
+
+
+
+
+
+
+    // SECOND OPTION
+
+
+
+
+
+    //[SerializeField]
+    //private int[] intArray;
+
+    //private List<GameObject> Buttons;
+
+    //void Start()
+    //{
+    //    Buttons = new List<GameObject>();
+
+    //    if (Buttons.Count > 0)
+    //    {
+    //        foreach (GameObject button in Buttons)
+    //        {
+    //            Destroy(button.gameObject);
+    //        }
+
+    //        Buttons.Clear();
+    //    }
+
+    //    foreach (int i in intArray)
+    //    {
+    //        GameObject button = Instantiate(ButtonTemplate) as GameObject;
+    //        button.SetActive(true);
+
+    //        button.GetComponent<ButtonListButton>().SetText("Button #" + i);
+    //        button.transform.SetParent(ButtonTemplate.transform.parent, false);
+    //    }
+    //}
+
+
+
+
+}
