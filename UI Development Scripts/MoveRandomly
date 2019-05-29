@@ -1,0 +1,98 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class MoveRandomly : MonoBehaviour {
+
+    public float accelerationTime = 2f;
+    public float maxSpeed = 5f;
+    private Vector2 movement;
+    private float timeLeft;
+
+    private Rigidbody rb;
+
+
+    public Text ScoreText;
+    public int score;
+
+
+
+    float colorduration = 1f;
+    float t = 0;
+    bool isReset = false;
+    Color[] colors = new Color[3];
+
+
+
+    private void Start()
+    {
+        ScoreText = GameObject.FindGameObjectWithTag("ScoreText").GetComponent<Text>();
+        rb = GetComponent<Rigidbody>();
+        Vector2 cubeSize = GetComponent<Collider>().bounds.size;
+        Debug.Log(cubeSize.x);
+        Debug.Log(cubeSize.y);
+        score = 0;
+        ScoreText.text = "Score: " + score.ToString();
+
+
+
+        colors[0] = Color.cyan;
+        colors[1] = Color.red;
+        colors[2] = Color.green;
+
+    
+
+
+}
+
+    void Update()
+    {
+        timeLeft -= Time.deltaTime;
+        if (timeLeft <= 0)
+        {
+            movement = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            timeLeft += accelerationTime;
+        }
+
+
+        if(timeLeft <= 0)
+        {
+            timeLeft = 0;
+        }
+
+        ColorChanger();
+        
+
+    }
+
+
+    void ColorChanger()
+    {
+        if (this.tag == "UIImage")
+        {
+           this.GetComponent<Image>().color = Color.Lerp(colors[Random.Range(0, colors.Length)], colors[Random.Range(0, colors.Length)], t);
+
+            if (t < 5)
+            {
+                t += Time.deltaTime / colorduration;
+            }
+        }
+    }
+    //
+
+
+    void FixedUpdate()
+    {
+        rb.AddForce(movement * maxSpeed);
+    }
+
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Destroy(this);
+            score = score + 10;
+        }
+    }
+}
