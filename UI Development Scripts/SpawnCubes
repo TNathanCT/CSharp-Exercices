@@ -1,0 +1,101 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SpawnCubes : MonoBehaviour
+{
+    public GameObject[] numberofcubes;
+    public int AppearingonScene = 3;
+    public int Score;
+    public GameObject CubePrefab;
+    public GameObject Canvas;
+
+    public float minSize = 0.3f;
+    public float maxSize = 0.05f;
+
+    public Transform SpawnPoint;
+
+    //[SerializeField] public Text UIText;
+    //[SerializeField] public int ourmaintimer;
+
+    //private float timer;
+    //private bool canCount = true;
+
+    public Text timer;
+    float minutes = 0;
+    float seconds = 5;
+    float milliseconds = 0;
+    float fraction = 0;
+
+
+
+
+
+    private void Start()
+    {
+        //timer = ourmaintimer;
+
+        if (Score < 3)
+        {
+            for (int i = 0; i < AppearingonScene; i++)
+            {
+                GameObject cube = Instantiate(CubePrefab, SpawnPoint.position, Quaternion.identity);
+                cube.transform.localScale = Vector2.one * Random.Range(minSize, maxSize);
+       
+                cube.transform.parent = Canvas.transform;
+               //cube.transform.localScale = cube.GetComponent<Renderer>().bounds.size;
+                // cube.GetComponent<Collider>().bounds.Encapsulate(cube.renderer);
+
+
+            }
+           
+        }
+    }
+
+    private void Update()
+    {
+        //if (timer >= 0.0f && canCount)
+        //{
+        //    timer -= Time.deltaTime*1000;
+        //    UIText.text = timer.ToString("F");
+
+        //}
+
+        if (milliseconds <= 0)
+        {
+            if (seconds <= 0)
+            {
+                minutes--;
+                seconds = 59;
+            }
+            else if (seconds >= 0)
+            {
+                seconds--;
+            }
+
+            milliseconds = 100;
+            fraction = 100;
+        }
+
+        milliseconds -= Time.deltaTime * 100;
+        fraction = (milliseconds * 10)%10;
+             
+        timer.text = string.Format("{0}:{1}:{2}:{3}", minutes, seconds, (int)milliseconds, fraction);
+        //convert it into int => "" + minutes....
+        //0 is never ==0, 1 Timer - delta.time, then split it up into components. If time left, /60
+
+        if(minutes <= 0 && seconds <= 0 && fraction <= 0)
+        {
+            minutes = 0;
+            seconds = 0;
+            milliseconds = 0;
+            fraction = 0;
+
+        }
+
+    }
+
+    //    int fraction = ourmaintimer * 10;
+    //    fraction = fraction % 10;
+}
