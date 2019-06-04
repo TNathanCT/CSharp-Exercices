@@ -1,0 +1,29 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PrefabAction : MonoBehaviour {
+
+
+
+    private Vector2 RandomVector(float min, float max)
+    {
+        var x = UnityEngine.Random.Range(min, max);
+        var y = UnityEngine.Random.Range(min, max);
+        return new Vector2(x, y);
+    }
+
+    private void Start()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.velocity = RandomVector(-5f,5f);
+       
+
+    }
+
+
+
+
+
+}
