@@ -1,0 +1,102 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Board : MonoBehaviour {
+
+    public int timeLeft = 60;
+    public Text countDown;
+
+    public GameObject FoodPrefab;
+    private int startSize;
+
+
+    public Vector3 center;
+    public Vector3 size;
+
+
+    public Text scoreText;
+    public int score;
+
+    void Start () {
+
+        SpawnFood();
+
+        Time.timeScale = 1;
+
+        StartCoroutine("LoseTime");
+
+
+
+        scoreText = GameObject.FindGameObjectWithTag("ScoreText").GetComponent<Text>();
+
+        score = 0;
+
+    }
+
+
+    void Update () {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            SpawnFood();
+        }
+
+        countDown.text = ("" + timeLeft);
+
+        scoreText.text = "Score: " + score.ToString();
+
+
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+
+            if(Physics.Raycast(ray, out hitInfo))
+            {
+                if(hitInfo.collider.gameObject.tag == "Player")
+                {
+                    
+                        score = score + 10;
+                        Destroy(hitInfo.collider.gameObject);
+                    
+                }
+            }
+        }
+
+
+
+    }
+
+    public void SpawnFood()
+    {
+        Vector3 pos = center + new Vector3(UnityEngine.Random.Range(-size.x / 2, size.x/2), UnityEngine.Random.Range(-size.y / 2, size.y / 2), UnityEngine.Random.Range(-size.z / 2, size.z / 2));
+
+        Instantiate(FoodPrefab, pos, Quaternion.identity);
+        startSize = UnityEngine.Random.Range(1, 5);
+        FoodPrefab.gameObject.transform.localScale = new Vector3(startSize, startSize, startSize);
+            
+    }
+
+     void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(center, size);
+    }
+
+    IEnumerator LoseTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            timeLeft--;
+        }
+    }
+
+
+    private void OnMouseDown()
+    {
+       
+    }
+}
