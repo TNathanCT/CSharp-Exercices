@@ -33,7 +33,7 @@ public class Grid : MonoBehaviour {
                 bool walkable = !(Physics.CheckSphere(worldPoint,nodeRadius,unwalkableMask));
 
                 //populate our grid with nodes
-				grid[x,y] = new Node(walkable,worldPoint);
+				grid[x,y] = new Node(walkable,worldPoint, x,y);
 			}
 		}
 	}
