@@ -1,0 +1,30 @@
+namespace CodilitySolutions.Iterations{
+
+    class BinaryGap{
+    
+        static void Main(string[] args){
+            int result = solution(1041)
+            Console.WriteLine(result);
+            Console.ReadKey();
+            
+            }
+            
+        private static int solution(int N){
+              var binary = Convert.ToString(N, 2);
+              
+              var regx = new Regex("(?<=1)(0+)(?=1)");// Find all the zeros inside 1s.
+              
+              int result = regex.Matches(binary)// go through all the occurances of the regular expressions and then return all the matches
+                  .Cast<Match>()
+                  .Select(x => x.Length)//select the length
+                  .DefaultIfEmpty(0)//Found none, then return a default value
+                  .Max();//find the maximum of the binary gap
+              return 0;
+              }
+              
+              
+}
+              
+            
+            
+            
