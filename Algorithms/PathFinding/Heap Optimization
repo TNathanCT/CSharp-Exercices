@@ -1,0 +1,131 @@
+using UnityEngine;
+using System.Collections;
+using System;
+
+
+//Heap is a binary tree where each node has at least two child nodes, and each of those nodes have their own child nodes, and so on.
+//It can be similar to an array, but each parent node must have and F cost that is less than both of it's child nodes.
+//Finding the parent of a node in the heap is :
+//                                               (N - 1)/2 -> Round down to the smallest number.
+//Find the child of a node in the heap is:
+//                                               2N + 1    or 2N + 2
+
+public class Heap<T> where T : IHeapItem<T> {
+	//takes the type T, so this means that instead of an array of nodes,we'll say an array of type T, which we can items.
+    
+	T[] items;
+	int currentItemCount;//keep track of current Itemcount.
+	
+
+    //know from the start what the maximum heap size is since and 'array' is rather difficult to resize.
+	public Heap(int maxHeapSize) {
+		items = new T[maxHeapSize];
+	}
+	
+    //adding not items to the Heap. 
+	public void Add(T item) {
+		item.HeapIndex = currentItemCount;
+		items[currentItemCount] = item;//add it the end of the array, but not necessarily where it belongs.
+		SortUp(item);
+		currentItemCount++;
+	}
+
+
+
+	public T RemoveFirst() {
+		T firstItem = items[0];//save the first item.
+		currentItemCount--;//we have one less item in our heap.
+
+		items[0] = items[currentItemCount];//put the last item in the first position.
+		items[0].HeapIndex = 0;
+		SortDown(items[0]);
+		return firstItem;
+	}
+
+    //IF we ever want to change the priority of an item
+	public void UpdateItem(T item) {
+		SortUp(item);
+	}
+
+	public int Count {
+		get {
+			return currentItemCount;
+		}
+	}
+
+    //checks if the bool does contain an item.
+	public bool Contains(T item) {
+		return Equals(items[item.HeapIndex], item);
+	}
+
+
+
+	void SortDown(T item) {
+		while (true) {
+			int childIndexLeft = item.HeapIndex * 2 + 1;
+			int childIndexRight = item.HeapIndex * 2 + 2;
+			int swapIndex = 0;
+
+			if (childIndexLeft < currentItemCount) {
+				swapIndex = childIndexLeft;
+
+				if (childIndexRight < currentItemCount) {
+                    //which child has a priority first?
+					if (items[childIndexLeft].CompareTo(items[childIndexRight]) < 0) {
+                        swapIndex = childIndexRight;
+                        //SwapIndex has the highest priority child.
+					}
+				}
+
+				if (item.CompareTo(items[swapIndex]) < 0) {
+					Swap (item,items[swapIndex]);
+                    //we check if the child has a higher priority over the parent.
+				}
+				else {
+					return;//if parent has higher priority exit out of the loop
+				}
+
+			}
+			else {
+				return;//if the parent has no child, then just exit out of the loop.
+			}
+
+		}
+	}
+	
+    //this is handle the sorting for us.
+	void SortUp(T item) {
+		int parentIndex = (item.HeapIndex-1)/2; //we grab the parent index
+		
+		while (true) {
+			T parentItem = items[parentIndex];
+			if (item.CompareTo(parentItem) > 0) {
+				Swap (item,parentItem);//if the item has a higher priority than the parent, swap position between the nodes
+			}
+			else {
+				break;
+			}
+
+			parentIndex = (item.HeapIndex-1)/2;
+		}
+	}
+	
+	void Swap(T itemA, T itemB) {
+        //swap them in the array
+		items[itemA.HeapIndex] = itemB;
+		items[itemB.HeapIndex] = itemA;
+
+        //swap the heapindex values. 
+		int itemAIndex = itemA.HeapIndex;
+		itemA.HeapIndex = itemB.HeapIndex;
+		itemB.HeapIndex = itemAIndex;
+	}
+}
+
+//This will give us the ability to know which node has the priority in the Heap.
+public interface IHeapItem<T> : IComparable<T> {
+	int HeapIndex {
+		get;
+		set;
+	}
+}
