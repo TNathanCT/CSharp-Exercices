@@ -3,7 +3,9 @@ using System.Collections;
 
 public class Grid : MonoBehaviour {
 
-	public bool onlyDisplayPathGizmos;
+//	public bool onlyDisplayPathGizmos;
+
+	public bool displayGridGizmos;
 	public LayerMask unwalkableMask;//where we cannot walk over
 	public Vector2 gridWorldSize;
 	public float nodeRadius;//how much space each node covers.
@@ -17,6 +19,12 @@ public class Grid : MonoBehaviour {
 		gridSizeX = Mathf.RoundToInt(gridWorldSize.x/nodeDiameter);
 		gridSizeY = Mathf.RoundToInt(gridWorldSize.y/nodeDiameter);
 		CreateGrid();
+	}
+
+	public int MaxSize {
+		get {
+			return gridSizeX * gridSizeY;
+		}
 	}
 
 	void CreateGrid() {
@@ -70,30 +78,40 @@ public class Grid : MonoBehaviour {
 		int y = Mathf.RoundToInt((gridSizeY-1) * percentY);
 		return grid[x,y];
 	}
+//
+//	void OnDrawGizmos() {//draws the cube in the Unity Scene
+//		Gizmos.DrawWireCube(transform.position,new Vector3(gridWorldSize.x,1,gridWorldSize.y));
+//        //The Y  axis represents the Z axis in 3D space
+//
+//		if (onlyDisplayPathGizmos) {//If the path is not null, the draw
+//			if (grid != null) {
+//				foreach (Node n in grid) {
+//					Gizmos.color = (n.walkable)?Color.white:Color.red;//if there is a collision draw them red, else they are white.
+//					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
+//				}
+///			}
+//		}
+//		else {
+//          // otherwise, draw everything
+//			if (grid != null) {
+//				foreach (Node n in grid) {
+//					Gizmos.color = (n.walkable)?Color.white:Color.red;
+//					if (path != null)
+//						if (path.Contains(n))
+//							Gizmos.color = Color.black;
+//					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
+//				}
+//			}
+//	}
 
-	void OnDrawGizmos() {//draws the cube in the Unity Scene
+	void OnDrawGizmos() {
 		Gizmos.DrawWireCube(transform.position,new Vector3(gridWorldSize.x,1,gridWorldSize.y));
-        //The Y  axis represents the Z axis in 3D space
-
-		if (onlyDisplayPathGizmos) {//If the path is not null, the draw
-			if (grid != null) {
-				foreach (Node n in grid) {
-					Gizmos.color = (n.walkable)?Color.white:Color.red;//if there is a collision draw them red, else they are white.
-					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
-				}
+		if (grid != null && displayGridGizmos) {
+			foreach (Node n in grid) {
+				Gizmos.color = (n.walkable)?Color.white:Color.red;
+				Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
 			}
 		}
-		else {
-            // otherwise, draw everything
-			if (grid != null) {
-				foreach (Node n in grid) {
-					Gizmos.color = (n.walkable)?Color.white:Color.red;
-					if (path != null)
-						if (path.Contains(n))
-							Gizmos.color = Color.black;
-					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
-				}
-			}
 	}
 
 public class Node : IHeapItem<Node> {
