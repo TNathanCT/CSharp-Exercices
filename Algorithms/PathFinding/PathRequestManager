@@ -1,0 +1,67 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System;
+
+//the time it takes for the computer to run the calculations for each individual gameobeject can cause the computer to freeze. As such, we will split the calculations over multiple frames, in order to allow the scene to move smoothly.
+
+
+public class PathRequestManager : MonoBehaviour {
+
+    //A Queue is a collection of objects (like and Array or a List). The main difference, is that you can only enqueue (put something inà at the very end of the dequeue (getting something out), at the beginning of the queue. It's a FirstIn-FirstOut
+	Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
+	PathRequest currentPathRequest;
+
+	static PathRequestManager instance;
+	Pathfinding pathfinding;
+
+	bool isProcessingPath;
+
+	void Awake() {
+        instance = this;
+		pathfinding = GetComponent<Pathfinding>();
+	}
+
+
+    //Action: not getting a response right away, since the requests are spread over a number of Frames, it's instead going to pass in a method, and we'll store the method, until we've finally calculated the path. 
+    //The Vector3 is for the path, and the boolean is whether or not the path has been successful.
+	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback) {
+        
+        PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback);
+        //add the new request to the queue.
+        instance.pathRequestQueue.Enqueue(newRequest);
+		instance.TryProcessNext();
+	}
+
+	void TryProcessNext() {
+        //if we are not processing a path, and if the Queue is not empty, 
+		if (!isProcessingPath && pathRequestQueue.Count > 0) {
+            //takes the first item out of the queue
+			currentPathRequest = pathRequestQueue.Dequeue();
+			isProcessingPath = true;
+            //start looking for the new path 
+			pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd);
+		}
+	}
+
+	public void FinishedProcessingPath(Vector3[] path, bool success) {
+		currentPathRequest.callback(path,success);
+		isProcessingPath = false;
+		TryProcessNext();
+	}
+
+
+    //This structure will store all the information about the path, and a call to the Action.
+	struct PathRequest {
+		public Vector3 pathStart;
+		public Vector3 pathEnd;
+		public Action<Vector3[], bool> callback;
+
+		public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback) {
+			pathStart = _start;
+			pathEnd = _end;
+			callback = _callback;
+		}
+
+	}
+}
