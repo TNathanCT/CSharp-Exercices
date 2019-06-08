@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Grid : MonoBehaviour {
 
+	public bool onlyDisplayPathGizmos;
 	public LayerMask unwalkableMask;//where we cannot walk over
 	public Vector2 gridWorldSize;
 	public float nodeRadius;//how much space each node covers.
@@ -70,20 +71,32 @@ public class Grid : MonoBehaviour {
 		return grid[x,y];
 	}
 
-	void OnDrawGizmos() {//drws the cube in the Unity Scene
+	void OnDrawGizmos() {//draws the cube in the Unity Scene
 		Gizmos.DrawWireCube(transform.position,new Vector3(gridWorldSize.x,1,gridWorldSize.y));
         //The Y  axis represents the Z axis in 3D space
 
-	
-		if (grid != null) {
-			foreach (Node n in grid) {
-				Gizmos.color = (n.walkable)?Color.white:Color.red;//if there is a collision draw them red, else they are white.
-				Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
+		if (onlyDisplayPathGizmos) {//If the path is not null, the draw
+			if (grid != null) {
+				foreach (Node n in grid) {
+					Gizmos.color = (n.walkable)?Color.white:Color.red;//if there is a collision draw them red, else they are white.
+					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
+				}
 			}
 		}
+		else {
+            // otherwise, draw everything
+			if (grid != null) {
+				foreach (Node n in grid) {
+					Gizmos.color = (n.walkable)?Color.white:Color.red;
+					if (path != null)
+						if (path.Contains(n))
+							Gizmos.color = Color.black;
+					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter-.1f));
+				}
+			}
 	}
-}
-public class Node {
+
+public class Node : IHeapItem<Node> {
 	
 	public bool walkable;
 	public Vector3 worldPosition;
@@ -93,6 +106,7 @@ public class Node {
 	public int gCost;
 	public int hCost;
 	public Node parent;
+	int heapIndex;
 	
 	public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY) {
 		walkable = _walkable;
@@ -105,6 +119,24 @@ public class Node {
 		get {
 			return gCost + hCost;
 		}
+	}
+
+	public int HeapIndex {
+		get {
+			return heapIndex;//each node has a value (item)
+		}
+		set {
+			heapIndex = value;
+		}
+	}
+
+    //compares the fcost of the different nodes 
+	public int CompareTo(Node nodeToCompare) {
+		int compare = fCost.CompareTo(nodeToCompare.fCost);
+		if (compare == 0) {
+			compare = hCost.CompareTo(nodeToCompare.hCost);
+		}
+		return -compare;//return 1 if higher
 	}
 }
 
