@@ -1,0 +1,84 @@
+boolean checkIfSymmetric(node n1, node n2){
+      if(n1 == null && n2 == null){
+          return true;
+      }
+      
+      if(n1 == nul || n2 == null){
+          return false);
+      }
+}
+
+
+if(n1.val == n2.val){
+        if(checkIfSymmetric(n1.left, n2.right) && checkIfSymmetric(n1.left, n2.right)){
+            return true;
+        }
+        return false;
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+using System;
+
+class Node{
+  public int key;
+  public Node left,right;
+  
+  public Node (int item){
+    key = item;
+    left = right = null;
+    }
+}
+
+class GFG {
+  Node root;
+  
+  //this will return true if the trees with roots as root1 and root2 mirror
+  boolean isMirror(Node node1, Node node2){
+          //if both trees are empty, then they mirror each other
+          if(node1 == null && node2 == null){
+                return true;
+          }
+          
+          //For two trees to be mirror images, the following three conditions must be true: 
+          //1) Their root node key must be the same 
+          //2) The left and right subtrees have to mirror
+          //3) The right and left subtrees have to mirror
+          
+          if(node1 != null && node2 != null && node1.key == node2.key){
+                return(isMirror(node1.left, node2.right) && isMirror(node1.right, node2.left));
+             }
+             
+          else{
+                return false;
+          }
+    }
+    
+    //returns true if the tree is symmetric with itself
+    Boolean isSymmetric(Node node){
+        //Check if the tree is a mirror of itself
+        return isMirror(root, root); 
+    }
+    
+    //Driver Code
+    static public void Main(String[] args){
+        GFG tree = new GFG();
+        tree.root = new Node(1);  
+        tree.root.left = new Node(2);  
+        tree.root.right = new Node(2);  
+        tree.root.left.left = new Node(3);  
+        tree.root.left.right = new Node(4);  
+        tree.root.right.left = new Node(4);  
+        tree.root.right.right = new Node(3);  
+        Boolean output = tree.isSymmetric(tree.root);  
+        if (output == true)  
+            Console.WriteLine("1");  
+        else
+            Console.WriteLine("0");  
+    }  
+}  
+    
+         
+         
+
