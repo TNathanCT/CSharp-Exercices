@@ -1,0 +1,17 @@
+//Logarithms -> how many times can we chop it in half?
+//log(2)16 = 4 (it can be chopped down 4 times in half)
+
+//say we had 4 billion nodes we have to search through, by using the log(2)4000000000 = 32, know that we have to look through 32 steps to find the node we are looking for.
+
+public void traverse(){
+      if(left != null){
+            left.traverse();
+            }
+      Console.WriteLine(this.data);//Print out the last node
+      if(right != null){
+            right.traverse();
+      }
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
