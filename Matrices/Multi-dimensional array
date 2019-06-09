@@ -1,0 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Matrices : MonoBehaviour {
+
+    //Two dimensional arrays are arrays that can hold other arrays inside them.
+    public static int Row = 6;
+    public static int Column = 5;
+    private int[,] numbers = new int[Row, Column];
+
+    private void Start()
+    {
+        for(int row = 0; row < Row; row++)
+        {
+            for(int col = 0; col < Column; col++)
+            {
+                numbers[row, col] = Random.Range(10, 50);
+            }
+        }
+    }
+
+
+
+}
