@@ -1,0 +1,54 @@
+/*
+This is a demo task.
+
+Write a function:
+
+    class Solution { public int solution(int[] A); }
+
+that, given an array A of N integers, returns the smallest positive integer (greater than 0) that does not occur in A.
+
+For example, given A = [1, 3, 6, 4, 1, 2], the function should return 5.
+
+Given A = [1, 2, 3], the function should return 4.
+
+Given A = [−1, −3], the function should return 1.
+
+Write an efficient algorithm for the following assumptions:
+
+        N is an integer within the range [1..100,000];
+        each element of array A is an integer within the range [−1,000,000..1,000,000].
+
+Copyright 2009–2019 by Codility Limited. All Rights Reserved. Unauthorized copying, publication or disclosure prohibited. 
+*/
+
+
+using System;
+using System.Collections.Generic;
+
+class Solution {
+    public int solution(int[] A) {
+
+        // the minimum possible answer is 1
+        int result = 1; 
+        // let's keep track of what we find
+        Dictionary<int,bool> found = new Dictionary<int,bool>();
+
+        // loop through the given array  
+        for(int i=0;i<A.Length;i++) {
+            // if we have a positive integer that we haven't found before
+            if(A[i] > 0 && !found.ContainsKey(A[i])) {
+                // record the fact that we found it
+                found.Add(A[i], true);
+            }
+        }
+
+        // crawl through what we found starting at 1
+        while(found.ContainsKey(result)) {
+            // look for the next number
+            result++;
+        }
+
+        // return the smallest positive number that we couldn't find.
+        return result;
+    }
+}
