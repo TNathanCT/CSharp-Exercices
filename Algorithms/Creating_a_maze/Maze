@@ -5,6 +5,7 @@ using UnityEngine;
 public class Maze : MonoBehaviour
 {
 
+
     public GameObject wall; //Where we will call the wall
     public int xSize = 5; //size of wall on the X axis
     public int ySize = 5; //size of wall on the y axis
@@ -13,6 +14,10 @@ public class Maze : MonoBehaviour
     Vector3 initialposition; //initial position of the maze.
 
     GameObject ParentofMaze;
+    public Cell[] cell;
+
+
+
 
     private void Start()
     {
@@ -66,7 +71,74 @@ public class Maze : MonoBehaviour
 
             }
         }
+
+        GeneratetheCells();
     }
 
 
+
+
+
+    void GeneratetheCells()
+    {
+        
+        //since we don't necessarily know how many walls the scene has, we create a variable that counts all the gameobjects that are a child of the Maze GO.
+        int childrenofMaze = ParentofMaze.transform.childCount;
+        //we going to save all the walls in the scene
+        GameObject[] AlloftheWallsinScene = new GameObject[childrenofMaze];
+
+        cell = new Cell[xSize * ySize];
+        int rightleftprocess = 0;
+        int childProcess = 0;
+        int count = 0;
+
+
+        for (int i = 0; i< childrenofMaze; i++)
+        {
+            AlloftheWallsinScene[i] = ParentofMaze.transform.GetChild(i).gameObject;
+        }
+
+        //assign the walls to each cell
+        for (int cellprocess = 0; cellprocess < cell.Length; cellprocess++)
+        {
+            cell[cellprocess] = new Cell();
+            //We're going to go through the cells one by one.
+            cell[cellprocess].Left = AlloftheWallsinScene[rightleftprocess];
+            cell[cellprocess].Bottom = AlloftheWallsinScene[childProcess+(xSize+1)*ySize];
+            
+            if(count == xSize)
+            {
+                rightleftprocess+=2;
+                count = 0;
+            }
+            else
+            {
+                rightleftprocess++;
+            }
+
+            count++;
+            childProcess++;
+            cell[cellprocess].Right = AlloftheWallsinScene[rightleftprocess];
+            cell[cellprocess].Top = AlloftheWallsinScene[(childProcess + (xSize + 1) * ySize) + xSize-1];
+
+
+        }
+    }
+
+
+
+
+
+
+
+//we're creating this class because I want to keep an eye on what's going on in the inspector.
+[System.Serializable] //thanks to this, we can see it in the inspector.
+    public class Cell
+    {
+        bool hastheSystemcheckedthiscell;
+        public GameObject Top;
+        public GameObject Left;
+        public GameObject Right;
+        public GameObject Bottom;
+    }
 }
