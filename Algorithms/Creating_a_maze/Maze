@@ -1,0 +1,72 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Maze : MonoBehaviour
+{
+
+    public GameObject wall; //Where we will call the wall
+    public int xSize = 5; //size of wall on the X axis
+    public int ySize = 5; //size of wall on the y axis
+    public float walllength = 1;//size of the wall on the z axis (in this case, it's the height)
+
+    Vector3 initialposition; //initial position of the maze.
+
+    GameObject ParentofMaze;
+
+    private void Start()
+    {
+        GenerateWalls();
+    }
+
+    void GenerateWalls()
+    {
+
+        //In order to keep things clean, I will put all the mazewalls as children of one gameobject.
+        ParentofMaze = new GameObject();
+        ParentofMaze.name = "Maze";
+
+
+
+        //Since we want to be on the center of the screen, we divide the x axis by 2
+        initialposition = new Vector3 ((-xSize/2) +walllength/2, 0f, (-ySize/2)+walllength/2);
+
+        //find the current position
+        Vector3 myposition = initialposition;
+        GameObject tempWall;
+
+
+
+        //create the for loops to create the walls
+        //this one will generate the walls on the x axis
+        for(int i  = 0; i < ySize; i++)
+        {
+            for(int x = 0; x <= xSize; x++)
+            {
+                myposition = new Vector3(initialposition.x + (x * walllength) - walllength / 2, 0f, initialposition.z + (i * walllength) - walllength/ 2);
+                //spawn the wall
+                tempWall = Instantiate(wall, myposition, Quaternion.identity) as GameObject;
+                tempWall.transform.parent = ParentofMaze.transform;
+
+
+            }
+        }
+
+        //this one will generate the walls on the y axis
+        for (int i = 0; i <= ySize; i++)
+        {
+            for (int j = 0; j < xSize; j++)
+            {
+                myposition = new Vector3(initialposition.x + (j * walllength), 0f, initialposition.z + (i * walllength) - walllength);
+                //spawn the wall and we will rotate it 90°
+                tempWall = Instantiate(wall, myposition, Quaternion.Euler(0f, 90f,0f)) as GameObject;
+                tempWall.transform.parent = ParentofMaze.transform;
+
+
+
+            }
+        }
+    }
+
+
+}
