@@ -16,8 +16,21 @@ public class Maze : MonoBehaviour
     GameObject ParentofMaze;
     public Cell[] cell;
 
+    int currentCell;
+    int totalcells;
 
 
+
+    int visitedRooms = 0; //the amount of rooms visited by the system
+
+    bool startedBuilding = false;
+    int currentNeighbor = 0;
+
+    List<int> lastRooms;
+    int backingUp = 0;
+
+
+    int walltobreak = 0; // which wall are we going to breaking in the Cell class.
 
     private void Start()
     {
@@ -81,7 +94,9 @@ public class Maze : MonoBehaviour
 
     void GeneratetheCells()
     {
-        
+        lastRooms = new List<int>();
+        lastRooms.Clear();
+        totalcells = xSize * ySize;
         //since we don't necessarily know how many walls the scene has, we create a variable that counts all the gameobjects that are a child of the Maze GO.
         int childrenofMaze = ParentofMaze.transform.childCount;
         //we going to save all the walls in the scene
@@ -123,9 +138,153 @@ public class Maze : MonoBehaviour
 
 
         }
+
+        GenerateMaze();
+    }
+
+    void BreakWall()
+    {
+        switch (walltobreak)
+        {
+            case 1:
+                cell[currentCell].Top.SetActive(false);
+                break;
+            case 2:
+                cell[currentCell].Left.SetActive(false);
+                break;
+            case 3:
+                cell[currentCell].Right.SetActive(false);
+                break;
+            case 4:
+                cell[currentCell].Bottom.SetActive(false);
+                break;
+        }
+
+
     }
 
 
+
+
+
+
+
+
+    void GenerateMaze()
+    {
+        while(visitedRooms < totalcells)
+        {
+            if (startedBuilding)
+            {
+                AnnonceNeighbor();
+                if(cell[currentNeighbor].hastheSystemcheckedthiscell == false && cell[currentCell].hastheSystemcheckedthiscell == true)
+                {
+                    BreakWall();
+                    cell[currentNeighbor].hastheSystemcheckedthiscell = true;
+                    visitedRooms++;
+                    lastRooms.Add(currentCell);
+                    currentCell = currentNeighbor;
+                    if(lastRooms.Count > 0)
+                    {
+                        backingUp = lastRooms.Count - 1;
+                    }
+                }
+            }
+            else
+            {
+                currentCell = Random.Range(0, totalcells);
+                cell[currentCell].hastheSystemcheckedthiscell = true;
+                visitedRooms++;
+                startedBuilding = true;
+            }
+
+            
+
+
+
+        }
+
+
+
+
+
+    }
+
+    void AnnonceNeighbor()
+    {
+        int[] connectingwalls = new int[4];
+        int Length = 0;
+        int[] neighbors = new int[4];
+        int checkcorners = 0;
+
+        //we are checking whether or not we are cornering the walls or not
+        checkcorners = ((currentCell + 1) / xSize);
+        checkcorners -= 1;
+        checkcorners *= xSize;
+        checkcorners += xSize;
+        
+
+        //Check the left wall
+        if(currentCell +1 < totalcells && (currentCell+1) != checkcorners)
+        {
+            if(cell[currentCell + 1].hastheSystemcheckedthiscell == false)
+            {
+                neighbors[Length] = currentCell + 1;
+                connectingwalls[Length] = 3;
+                Length++;
+            }
+        }
+
+        //Check the right wall
+        if (currentCell - 1 >= 0 && currentCell != checkcorners)
+        {
+            if (cell[currentCell - 1].hastheSystemcheckedthiscell == false)
+            {
+                neighbors[Length] = currentCell - 1;
+                connectingwalls[Length] = 2;
+                Length++;
+            }
+        }
+
+        //Check the top wall
+        if (currentCell + xSize < totalcells)
+        {
+            if (cell[currentCell + xSize].hastheSystemcheckedthiscell == false)
+            {
+                neighbors[Length] = currentCell + xSize;
+                connectingwalls[Length] = 1;
+                Length++;
+            }
+        }
+
+        //Check the bot wall
+        if (currentCell - xSize >= 0)
+        {
+            if (cell[currentCell - xSize].hastheSystemcheckedthiscell == false)
+            {
+                neighbors[Length] = currentCell - xSize;
+                connectingwalls[Length] = 4;
+                Length++;
+            }
+        }
+
+
+        if(Length != 0)
+        {
+            int thechosenOne = Random.Range(0, Length);
+            currentNeighbor = neighbors[thechosenOne];
+            walltobreak = connectingwalls[thechosenOne];
+        }
+        else
+        {
+            if(backingUp > 0)
+            {
+                currentCell = lastRooms[backingUp];
+                backingUp--;
+            }
+        }
+
+    }
 
 
 
@@ -135,7 +294,7 @@ public class Maze : MonoBehaviour
 [System.Serializable] //thanks to this, we can see it in the inspector.
     public class Cell
     {
-        bool hastheSystemcheckedthiscell;
+        public bool hastheSystemcheckedthiscell;
         public GameObject Top;
         public GameObject Left;
         public GameObject Right;
