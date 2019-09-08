@@ -1,0 +1,61 @@
+Write a program that prints the temperature closest to 0 among input data. If two numbers are equally close to zero, 
+positive integer has to be considered closest to zero (for instance, if the temperatures are -5 and 5, then display 5).
+
+
+using System;
+using System.Linq;
+using System.IO;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+
+class Solution_NUMBER_ONE
+{
+    static void Main(string[] args)
+    {
+        int n = int.Parse(Console.ReadLine()); // the number of temperatures to analyse
+        string[] inputs = Console.ReadLine().Split(' ');
+        
+        List<int> temps = new List<int>(); //first, we want to create a list
+        for (int i = 0; i < n; i++)
+        {
+            int t = int.Parse(inputs[i]);// a temperature expressed as an integer ranging from -273 to 5526
+            temps.Add(t);//We now add the ints to the List
+        }
+        
+        
+         if(temps.Any()){
+            
+             int min = temps.Select(x => Math.Abs(x)).Min();
+             Console.WriteLine(temps.Contains(min) ? min : -1*min);
+             //The line above reads as: if the temps list contains the min, THEN return min, 
+             //OTHERWISE return the negative number of min.
+        }
+        
+        else{
+             Console.Write(0);
+        }
+            
+
+     //   Console.WriteLine(temps.Select(x => Math.Abs(x)).Min());//This one only shows the positives. 
+        //It basically goes as, remove the negative numbers, and show the positive smallest
+    }
+}
+__________________________________________________________________________________________________________________________________
+class Solution_NUMBER_TWO
+{
+    static void Main(string[] args)
+    {
+        int n = int.Parse(Console.ReadLine()); // the number of temperatures to analyse
+        if(n==0){
+            Console.WriteLine(0);
+            return;
+        }
+        
+        List<int> temps = Console.ReadLine().Split(' ').Select(s => int.Parse(s)).ToList();
+        int minTemp = temps.GroupBy(x => Math.Abs(x)).OrderBy(grp=>grp.Key).FirstOrDefault().Max();
+        Console.WriteLine(minTemp);
+       
+    }
+}
+     
