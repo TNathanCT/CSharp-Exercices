@@ -1,0 +1,38 @@
+using System;
+using System.Linq;
+using System.IO;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+
+class Solution
+{
+    static void Main(string[] args)
+    {
+        //We set the number of horses
+        int N = int.Parse(Console.ReadLine());
+        
+        //Then, we store them all into an Array
+        int[] P = new int[N];
+        
+        for (int i = 0; i < N; i++)
+        {
+            P[i] = int.Parse(Console.ReadLine());
+        }
+
+        //Sort horse strengths.
+        Array.Sort(P);
+        
+        //Find D - which is the difference between the strengths of the horses
+        int D = int.MaxValue;
+        
+        for (int i = 1; i < N; i++)
+        {
+            //Then, for each horse, we we check the strength, and then subtract its' strength from the previous one  
+            D = Math.Min(D, P[i] - P[i - 1]);
+        }
+        
+        //Print D.
+        Console.WriteLine(D);
+    }
+}
