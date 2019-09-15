@@ -1,0 +1,47 @@
+using System;
+using System.Linq;
+using System.IO;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+
+/*
+ASCII art allows you to represent forms by using characters. To be precise, in our case, these forms are words. For example, the word "MANHATTAN" could be displayed as follows in ASCII art:
+ 
+# #  #  ### # #  #  ### ###  #  ###
+### # # # # # # # #  #   #  # # # #
+### ### # # ### ###  #   #  ### # #
+# # # # # # # # # #  #   #  # # # #
+# # # # # # # # # #  #   #  # # # #
+ 
+
+​Your mission is to write a program that can display a line of text in ASCII art in a style you are given as input.
+*/
+
+class Solution
+{   public const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    static void Main(string[] args)
+    {
+        int L = int.Parse(Console.ReadLine());//Length of the art
+        int H = int.Parse(Console.ReadLine());//Height of the art
+        string Text = Console.ReadLine().ToUpper();
+        
+        for (int i = 0; i < H; i++)
+        {
+            string ROW = Console.ReadLine();
+            
+            string T = string.Empty;
+            for(int j = 0; j<Text.Length; j++){
+                int ind = letters.IndexOf(Text[j]);
+                T += ROW.Substring((ind == -1 ? 26 : ind) * L, L);
+            
+        }
+        
+        
+
+
+        Console.WriteLine(T);
+    }
+}
+}
