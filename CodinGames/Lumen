@@ -1,0 +1,100 @@
+using System;
+using System.Linq;
+using System.IO;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+/*
+THEY put you in a square shape room, with N meters on each side.
+THEY want to know everything about you.
+THEY are observing you.
+THEY placed some candles in the room.
+
+Every candle makes L "light" in the spot they are, and every spot in square shape gets one less "light" as the next ones. If a spot is touched by two candles, it will have the larger "light" it can have. Every spot has the base light of 0.
+
+You can hide only, if you find a dark spot which has 0 "light".
+How many dark spots you have?
+
+You will receive a map of the room, with the empty places (X) and Candles (C) in N rows, each character separated by a space.
+
+Example for the light spread N = 5, L = 3:
+X X X X X
+X C X X X
+X X X X X
+X X X X X
+X X X X X
+
+2 2 2 1 0
+2 3 2 1 0
+2 2 2 1 0
+1 1 1 1 0
+0 0 0 0 0
+*/
+
+
+
+class Solution
+{
+    
+    static void Main(string[] args)
+    {
+        int N = int.Parse(Console.ReadLine());//Length of one side of the room
+        int L = int.Parse(Console.ReadLine());//Base light of the candles
+        
+        int[,] grid = new int[N,N]; //since we want to create a table, we 
+        //create a grid that takes the N size of the room.
+        
+        //Now we must create that grid.
+        //This is for the x axis
+        for (int xx = 0; xx < N; xx++)
+        {   
+            //we create an array
+            string[] line = Console.ReadLine().Split();
+            //This is for the y axis
+            for(int yy = 0; yy < N; yy++){
+                //we set the grid, and then in the y axis, we create the 
+                //C, then we set the 0
+                grid[xx,yy] = line[yy] == "C" ? L : 0;
+            
+            }
+        }
+            
+            //Now that we have our location and the grid, we need to 
+            //add the dimmed spots
+            //We use the base light of the Candle L, and have it become
+            //dimmer the further we get from it
+            for(int i = L - 1; i>0; i--){
+                for(int xaxis = 0; xaxis<N; xaxis++){
+                    for(int yaxis = 0; yaxis<N; yaxis++){
+                        //Now, we need to find the biggest surrounding cell
+                        int max_surrounding_cell = 0;
+                        
+                        for(int x_step = -1; x_step<=1; x_step++){
+                            for(int y_step= -1; y_step<=1; y_step++){
+                                if(0 <= xaxis + x_step && xaxis + x_step < N && 0 <= yaxis + y_step && yaxis + y_step < N)
+                                 { 
+                                   max_surrounding_cell = Math.Max(max_surrounding_cell, grid[xaxis + x_step, yaxis + y_step]);
+                                 }
+                            }
+                            
+                        }
+                        
+                        //Dimmed spot on (x, y) is the maximum in the surrounding
+                        //cells minus one
+                        grid[xaxis,yaxis] = Math.Max(grid[xaxis,yaxis], max_surrounding_cell - 1);
+                    }
+                }
+            }
+            
+            //Now we need to cound the dark spots and print our result
+            int darkspots= 0;
+            for(int xxaxis =0; xxaxis<N;xxaxis++){
+                for(int yyaxis =0; yyaxis <N; yyaxis++){
+                    if(grid[xxaxis,yyaxis] == 0){
+                        darkspots++;
+                    }
+                }
+            }   
+        Console.WriteLine(darkspots);
+    }
+}
