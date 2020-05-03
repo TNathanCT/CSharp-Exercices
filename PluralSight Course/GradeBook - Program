@@ -1,0 +1,27 @@
+using System;
+using System.Collections.Generic;
+namespace GradeBook
+{
+
+
+    class Program
+    {
+        //Static are not associated with object instances. 
+        //They are associated with the Types they define.
+        static void Main(string[] args)
+        {
+
+            var book = new Book("Thomas' Grade Book");
+
+            book.AddGrade(23.2);
+            book.AddGrade(66.9);
+            book.AddGrade(34.6);
+            
+            book.ShowStatistics();
+
+
+        }
+    }
+    
+
+}
